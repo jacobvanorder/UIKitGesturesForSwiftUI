@@ -1,25 +1,67 @@
-# CLAUDE.md
+# Project: UIKitGesturesForSwiftUI
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+## Quick Reference
+- **Platform**: iOS 18+
+- **Language**: Swift 6.0
+- **UI Framework**: SwiftUI, UIKit
+- **Minimum Deployment**: iOS 18.0
+- **Package Manager**: Swift Package Manager
 
-## Project Overview
+## XcodeBuildMCP Integration
+**IMPORTANT**: This project uses XcodeBuildMCP for all Xcode operations.
+- Build: `mcp__xcodebuildmcp__build_sim_name_proj`
+- Test: `mcp__xcodebuildmcp__test_sim_name_proj`
+- Clean: `mcp__xcodebuildmcp__clean`
 
-UIKitGesturesForSwiftUI is a Swift library that provides advanced gesture recognizers for SwiftUI by leveraging `UIGestureRecognizerRepresentable` for full UIKit feature parity and complex interaction support.
+## Coding Standards
 
-## Build & Test
+### Swift Style
+- Use Swift 6 strict concurrency
+- Prefer `@Observable` over `ObservableObject`
+- Use `async/await` for all async operations
+- Follow Apple's Swift API Design Guidelines
+- Use `guard` for early exits
+- Prefer value types (structs) over reference types (classes)
 
-This is a Swift Package. Once `Package.swift` is created:
-- **Build:** `swift build`
-- **Test:** `swift test`
-- **Single test:** `swift test --filter <TestClassName>/<testMethodName>`
-- **Xcode:** Open `Package.swift` directly in Xcode
+### SwiftUI Patterns
+- Extract views when they exceed 100 lines
+- Use `@State` for local view state only
+- Use `@Environment` for dependency injection
+- Prefer `NavigationStack` over deprecated `NavigationView`
+- Use `@Bindable` for bindings to @Observable objects
 
-## Architecture
 
-The library bridges UIKit's gesture recognizer system into SwiftUI using `UIGestureRecognizerRepresentable` (iOS 18+). The goal is SwiftUI view modifiers that expose the full power of UIKit gesture recognizers (e.g., simultaneous recognition, failure requirements, delegate callbacks) with a declarative API.
+### Error Handling
+```swift
+// Always use typed errors
+enum AppError: LocalizedError {
+    case networkError(underlying: Error)
+    case validationError(message: String)
+    
+    var errorDescription: String? {
+        switch self {
+        case .networkError(let error): return error.localizedDescription
+        case .validationError(let msg): return msg
+        }
+    }
+}
+```
 
-## Conventions
+## Testing Requirements
+- Unit tests for all ViewModels
+- UI tests for critical user flows
+- Use Swift Testing framework (`@Test`, `#expect`)
+- Minimum 80% code coverage for business logic
 
-- **Target platform:** iOS (UIKit interop via UIGestureRecognizerRepresentable)
-- **Distribution:** Swift Package Manager
-- **License:** MIT
+## DO NOT
+- Write UITests during scaffolding phase
+- Use deprecated APIs (UIKit when SwiftUI suffices)
+- Create massive monolithic views
+- Use force unwrapping (`!`) without justification
+- Ignore Swift 6 concurrency warnings
+
+## Planning Workflow
+When starting new features:
+1. Use `ultrathink` for architectural decisions
+2. Use Plan Mode (`Shift+Tab`) for implementation strategy
+3. Implement incrementally with tests
