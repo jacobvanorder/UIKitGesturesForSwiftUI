@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__xcode__XcodeRead",
+      "mcp__xcode__DocumentationSearch"
+    ]
+  }
+}
