@@ -2,7 +2,8 @@
   "permissions": {
     "allow": [
       "mcp__xcode__XcodeRead",
-      "mcp__xcode__DocumentationSearch"
+      "mcp__xcode__DocumentationSearch",
+      "mcp__xcode__XcodeListWindows"
     ]
   }
 }
