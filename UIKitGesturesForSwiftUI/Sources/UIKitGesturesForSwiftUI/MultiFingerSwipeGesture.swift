@@ -132,6 +132,12 @@ public struct MultiFingerSwipeGesture: UIGestureRecognizerRepresentable {
     /// to get individual finger positions.
     private let onEnded: ((UISwipeGestureRecognizer) -> Void)?
 
+    // MARK: - Delegate Closures
+
+    /// An optional closure that determines whether the gesture recognizer should begin
+    /// interpreting touches. When `nil`, defaults to `true`.
+    private let shouldBegin: ((UIGestureRecognizer) -> Bool)?
+
     /// An optional closure that determines whether this gesture recognizer should
     /// recognize simultaneously with another gesture recognizer.
     ///
@@ -145,6 +151,28 @@ public struct MultiFingerSwipeGesture: UIGestureRecognizerRepresentable {
     /// the other gesture recognizer.
     private let shouldRecognizeSimultaneouslyWith: ((UIGestureRecognizer) -> Bool)?
 
+    /// An optional closure that determines whether the gesture recognizer should
+    /// receive a given touch. When `nil`, defaults to `true`.
+    private let shouldReceiveTouch: ((UIGestureRecognizer, UITouch) -> Bool)?
+
+    /// An optional closure that determines whether the gesture recognizer should
+    /// receive a given press. When `nil`, defaults to `true`.
+    private let shouldReceivePress: ((UIGestureRecognizer, UIPress) -> Bool)?
+
+    /// An optional closure that determines whether the gesture recognizer should
+    /// receive a given event. When `nil`, defaults to `true`.
+    private let shouldReceiveEvent: ((UIGestureRecognizer, UIEvent) -> Bool)?
+
+    /// An optional closure that determines whether this gesture recognizer should
+    /// require the other gesture recognizer to fail before it can begin.
+    /// When `nil`, defaults to `false`.
+    private let shouldRequireFailureOf: ((UIGestureRecognizer) -> Bool)?
+
+    /// An optional closure that determines whether this gesture recognizer should
+    /// be required to fail by the other gesture recognizer.
+    /// When `nil`, defaults to `false`.
+    private let shouldBeRequiredToFailBy: ((UIGestureRecognizer) -> Bool)?
+
     // MARK: - Initializer
 
     /// Creates a new `MultiFingerSwipeGesture` with the specified configuration.
@@ -154,16 +182,39 @@ public struct MultiFingerSwipeGesture: UIGestureRecognizerRepresentable {
     ///     Pass a single value like `.left` or combine multiple like `[.up, .down]`.
     ///   - numberOfTouchesRequired: The number of fingers required. Defaults to `1`.
     ///   - onEnded: Closure called when the swipe is recognized. Defaults to `nil`.
+    ///   - shouldBegin: Closure to control whether the gesture should begin. Defaults to `nil` (`true`).
     ///   - shouldRecognizeSimultaneouslyWith: Closure to control simultaneous gesture
     ///     recognition. Defaults to `nil` (allows simultaneous recognition).
+    ///   - shouldReceiveTouch: Closure to control whether the gesture receives a touch.
+    ///     Defaults to `nil` (`true`).
+    ///   - shouldReceivePress: Closure to control whether the gesture receives a press.
+    ///     Defaults to `nil` (`true`).
+    ///   - shouldReceiveEvent: Closure to control whether the gesture receives an event.
+    ///     Defaults to `nil` (`true`).
+    ///   - shouldRequireFailureOf: Closure to control failure requirements.
+    ///     Defaults to `nil` (`false`).
+    ///   - shouldBeRequiredToFailBy: Closure to control failure requirements.
+    ///     Defaults to `nil` (`false`).
     public init(direction: UISwipeGestureRecognizer.Direction = .right,
                 numberOfTouchesRequired: Int = 1,
                 onEnded: ((UISwipeGestureRecognizer) -> Void)? = nil,
-                shouldRecognizeSimultaneouslyWith: ((UIGestureRecognizer) -> Bool)? = nil) {
+                shouldBegin: ((UIGestureRecognizer) -> Bool)? = nil,
+                shouldRecognizeSimultaneouslyWith: ((UIGestureRecognizer) -> Bool)? = nil,
+                shouldReceiveTouch: ((UIGestureRecognizer, UITouch) -> Bool)? = nil,
+                shouldReceivePress: ((UIGestureRecognizer, UIPress) -> Bool)? = nil,
+                shouldReceiveEvent: ((UIGestureRecognizer, UIEvent) -> Bool)? = nil,
+                shouldRequireFailureOf: ((UIGestureRecognizer) -> Bool)? = nil,
+                shouldBeRequiredToFailBy: ((UIGestureRecognizer) -> Bool)? = nil) {
         self.direction = direction
         self.numberOfTouchesRequired = numberOfTouchesRequired
         self.onEnded = onEnded
+        self.shouldBegin = shouldBegin
         self.shouldRecognizeSimultaneouslyWith = shouldRecognizeSimultaneouslyWith
+        self.shouldReceiveTouch = shouldReceiveTouch
+        self.shouldReceivePress = shouldReceivePress
+        self.shouldReceiveEvent = shouldReceiveEvent
+        self.shouldRequireFailureOf = shouldRequireFailureOf
+        self.shouldBeRequiredToFailBy = shouldBeRequiredToFailBy
     }
 
     // MARK: - UIGestureRecognizerRepresentable
@@ -208,7 +259,13 @@ public struct MultiFingerSwipeGesture: UIGestureRecognizerRepresentable {
         MultiFingerSwipeGesture(direction: self.direction,
                                 numberOfTouchesRequired: self.numberOfTouchesRequired,
                                 onEnded: action,
-                                shouldRecognizeSimultaneouslyWith: self.shouldRecognizeSimultaneouslyWith)
+                                shouldBegin: self.shouldBegin,
+                                shouldRecognizeSimultaneouslyWith: self.shouldRecognizeSimultaneouslyWith,
+                                shouldReceiveTouch: self.shouldReceiveTouch,
+                                shouldReceivePress: self.shouldReceivePress,
+                                shouldReceiveEvent: self.shouldReceiveEvent,
+                                shouldRequireFailureOf: self.shouldRequireFailureOf,
+                                shouldBeRequiredToFailBy: self.shouldBeRequiredToFailBy)
     }
 
     // MARK: - Action Handling
@@ -245,41 +302,15 @@ public struct MultiFingerSwipeGesture: UIGestureRecognizerRepresentable {
 
     /// Creates the coordinator that serves as the gesture recognizer's delegate.
     ///
-    /// The coordinator handles the `UIGestureRecognizerDelegate` method for
-    /// simultaneous recognition, forwarding the decision to the
-    /// `shouldRecognizeSimultaneouslyWith` closure if one was provided.
-    public func makeCoordinator(converter: CoordinateSpaceConverter) -> Coordinator {
-        Coordinator(shouldRecognizeSimultaneouslyWith: shouldRecognizeSimultaneouslyWith)
-    }
-
-    /// The delegate object for the underlying `UISwipeGestureRecognizer`.
-    ///
-    /// This coordinator implements `UIGestureRecognizerDelegate` to control whether
-    /// the swipe gesture can be recognized simultaneously with other gestures.
-    /// By default (when no `shouldRecognizeSimultaneouslyWith` closure is provided),
-    /// simultaneous recognition is allowed.
-    public class Coordinator: NSObject, UIGestureRecognizerDelegate {
-
-        /// The closure used to decide simultaneous recognition.
-        /// When `nil`, simultaneous recognition defaults to `true`.
-        let shouldRecognizeSimultaneouslyWith: ((UIGestureRecognizer) -> Bool)?
-
-        internal init(shouldRecognizeSimultaneouslyWith: ((UIGestureRecognizer) -> Bool)? = nil) {
-            self.shouldRecognizeSimultaneouslyWith = shouldRecognizeSimultaneouslyWith
-        }
-
-        /// Called by UIKit to ask whether this gesture recognizer should recognize
-        /// simultaneously with another.
-        ///
-        /// - Parameters:
-        ///   - gestureRecognizer: The swipe gesture recognizer owned by this struct.
-        ///   - otherGestureRecognizer: Another gesture recognizer that wants to recognize
-        ///     at the same time.
-        /// - Returns: `true` if both gestures should proceed simultaneously, `false` otherwise.
-        ///   Defaults to `true` when no custom closure is provided.
-        public func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer,
-                                      shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
-            return self.shouldRecognizeSimultaneouslyWith?(otherGestureRecognizer) ?? true
-        }
+    /// The coordinator handles all `UIGestureRecognizerDelegate` methods,
+    /// forwarding each decision to the corresponding closure if one was provided.
+    public func makeCoordinator(converter: CoordinateSpaceConverter) -> GestureCoordinator {
+        GestureCoordinator(shouldBegin: shouldBegin,
+                           shouldRecognizeSimultaneouslyWith: shouldRecognizeSimultaneouslyWith,
+                           shouldReceiveTouch: shouldReceiveTouch,
+                           shouldReceivePress: shouldReceivePress,
+                           shouldReceiveEvent: shouldReceiveEvent,
+                           shouldRequireFailureOf: shouldRequireFailureOf,
+                           shouldBeRequiredToFailBy: shouldBeRequiredToFailBy)
     }
 }
