@@ -130,13 +130,13 @@ public struct MultiFingerSwipeGesture: UIGestureRecognizerRepresentable {
     /// and finger count is completed. The recognizer is passed so you can query
     /// `location(in:)` to determine where the swipe started, or `location(ofTouch:in:)`
     /// to get individual finger positions.
-    private let onEnded: ((UISwipeGestureRecognizer) -> Void)?
+    private let onEnded: (@MainActor (UISwipeGestureRecognizer) -> Void)?
 
     // MARK: - Delegate Closures
 
     /// An optional closure that determines whether the gesture recognizer should begin
     /// interpreting touches. When `nil`, defaults to `true`.
-    private let shouldBegin: ((UIGestureRecognizer) -> Bool)?
+    private let shouldBegin: (@MainActor (UIGestureRecognizer) -> Bool)?
 
     /// An optional closure that determines whether this gesture recognizer should
     /// recognize simultaneously with another gesture recognizer.
@@ -149,29 +149,29 @@ public struct MultiFingerSwipeGesture: UIGestureRecognizerRepresentable {
     /// By default, a swipe and a pan on the same view would conflict. You can use
     /// this closure to allow or deny simultaneous recognition based on the type of
     /// the other gesture recognizer.
-    private let shouldRecognizeSimultaneouslyWith: ((UIGestureRecognizer) -> Bool)?
+    private let shouldRecognizeSimultaneouslyWith: (@MainActor (UIGestureRecognizer) -> Bool)?
 
     /// An optional closure that determines whether the gesture recognizer should
     /// receive a given touch. When `nil`, defaults to `true`.
-    private let shouldReceiveTouch: ((UIGestureRecognizer, UITouch) -> Bool)?
+    private let shouldReceiveTouch: (@MainActor (UIGestureRecognizer, UITouch) -> Bool)?
 
     /// An optional closure that determines whether the gesture recognizer should
     /// receive a given press. When `nil`, defaults to `true`.
-    private let shouldReceivePress: ((UIGestureRecognizer, UIPress) -> Bool)?
+    private let shouldReceivePress: (@MainActor (UIGestureRecognizer, UIPress) -> Bool)?
 
     /// An optional closure that determines whether the gesture recognizer should
     /// receive a given event. When `nil`, defaults to `true`.
-    private let shouldReceiveEvent: ((UIGestureRecognizer, UIEvent) -> Bool)?
+    private let shouldReceiveEvent: (@MainActor (UIGestureRecognizer, UIEvent) -> Bool)?
 
     /// An optional closure that determines whether this gesture recognizer should
     /// require the other gesture recognizer to fail before it can begin.
     /// When `nil`, defaults to `false`.
-    private let shouldRequireFailureOf: ((UIGestureRecognizer) -> Bool)?
+    private let shouldRequireFailureOf: (@MainActor (UIGestureRecognizer) -> Bool)?
 
     /// An optional closure that determines whether this gesture recognizer should
     /// be required to fail by the other gesture recognizer.
     /// When `nil`, defaults to `false`.
-    private let shouldBeRequiredToFailBy: ((UIGestureRecognizer) -> Bool)?
+    private let shouldBeRequiredToFailBy: (@MainActor (UIGestureRecognizer) -> Bool)?
 
     // MARK: - Initializer
 
@@ -197,14 +197,14 @@ public struct MultiFingerSwipeGesture: UIGestureRecognizerRepresentable {
     ///     Defaults to `nil` (`false`).
     public init(direction: UISwipeGestureRecognizer.Direction = .right,
                 numberOfTouchesRequired: Int = 1,
-                onEnded: ((UISwipeGestureRecognizer) -> Void)? = nil,
-                shouldBegin: ((UIGestureRecognizer) -> Bool)? = nil,
-                shouldRecognizeSimultaneouslyWith: ((UIGestureRecognizer) -> Bool)? = nil,
-                shouldReceiveTouch: ((UIGestureRecognizer, UITouch) -> Bool)? = nil,
-                shouldReceivePress: ((UIGestureRecognizer, UIPress) -> Bool)? = nil,
-                shouldReceiveEvent: ((UIGestureRecognizer, UIEvent) -> Bool)? = nil,
-                shouldRequireFailureOf: ((UIGestureRecognizer) -> Bool)? = nil,
-                shouldBeRequiredToFailBy: ((UIGestureRecognizer) -> Bool)? = nil) {
+                onEnded: (@MainActor (UISwipeGestureRecognizer) -> Void)? = nil,
+                shouldBegin: (@MainActor (UIGestureRecognizer) -> Bool)? = nil,
+                shouldRecognizeSimultaneouslyWith: (@MainActor (UIGestureRecognizer) -> Bool)? = nil,
+                shouldReceiveTouch: (@MainActor (UIGestureRecognizer, UITouch) -> Bool)? = nil,
+                shouldReceivePress: (@MainActor (UIGestureRecognizer, UIPress) -> Bool)? = nil,
+                shouldReceiveEvent: (@MainActor (UIGestureRecognizer, UIEvent) -> Bool)? = nil,
+                shouldRequireFailureOf: (@MainActor (UIGestureRecognizer) -> Bool)? = nil,
+                shouldBeRequiredToFailBy: (@MainActor (UIGestureRecognizer) -> Bool)? = nil) {
         self.direction = direction
         self.numberOfTouchesRequired = numberOfTouchesRequired
         self.onEnded = onEnded
@@ -255,7 +255,7 @@ public struct MultiFingerSwipeGesture: UIGestureRecognizerRepresentable {
     ///         // Handle the swipe
     ///     }
     /// ```
-    public func onEnded(_ action: @escaping (UISwipeGestureRecognizer) -> Void) -> MultiFingerSwipeGesture {
+    public func onEnded(_ action: @escaping @MainActor (UISwipeGestureRecognizer) -> Void) -> MultiFingerSwipeGesture {
         MultiFingerSwipeGesture(direction: self.direction,
                                 numberOfTouchesRequired: self.numberOfTouchesRequired,
                                 onEnded: action,

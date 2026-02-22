@@ -133,7 +133,7 @@ public struct MultiFingerPinchGesture: UIGestureRecognizerRepresentable {
     /// recognized as a pinch. The `scale` on the recognizer will be close to `1.0`.
     /// This is the ideal place to cache your content's original size or transform
     /// so you can apply the absolute scale factor in subsequent `onChanged` calls.
-    private let onBegan: ((UIPinchGestureRecognizer) -> Void)?
+    private let onBegan: (@MainActor (UIPinchGestureRecognizer) -> Void)?
 
     /// Called each time the gesture transitions to the `.changed` state.
     ///
@@ -145,20 +145,20 @@ public struct MultiFingerPinchGesture: UIGestureRecognizerRepresentable {
     /// > Tip: If you need delta-based scaling, reset `recognizer.scale = 1.0`
     /// > at the end of each `onChanged` call. See the class-level documentation
     /// > for a full example.
-    private let onChanged: ((UIPinchGestureRecognizer) -> Void)?
+    private let onChanged: (@MainActor (UIPinchGestureRecognizer) -> Void)?
 
     /// Called when the gesture transitions to the `.ended` state.
     ///
     /// This fires when the user lifts one or both fingers, completing the pinch.
     /// You can still read `recognizer.velocity` at this point — useful for driving
     /// momentum-based zoom animations that continue after the fingers lift.
-    private let onEnded: ((UIPinchGestureRecognizer) -> Void)?
+    private let onEnded: (@MainActor (UIPinchGestureRecognizer) -> Void)?
 
     // MARK: - Delegate Closures
 
     /// An optional closure that determines whether the gesture recognizer should begin
     /// interpreting touches. When `nil`, defaults to `true`.
-    private let shouldBegin: ((UIGestureRecognizer) -> Bool)?
+    private let shouldBegin: (@MainActor (UIGestureRecognizer) -> Bool)?
 
     /// An optional closure that determines whether this gesture recognizer should
     /// recognize simultaneously with another gesture recognizer.
@@ -171,29 +171,29 @@ public struct MultiFingerPinchGesture: UIGestureRecognizerRepresentable {
     /// both a `MultiFingerPinchGesture` and a `UIRotationGestureRecognizer` to
     /// the same view, allowing simultaneous recognition lets the user scale and
     /// rotate content in a single two-finger motion.
-    private let shouldRecognizeSimultaneouslyWith: ((UIGestureRecognizer) -> Bool)?
+    private let shouldRecognizeSimultaneouslyWith: (@MainActor (UIGestureRecognizer) -> Bool)?
 
     /// An optional closure that determines whether the gesture recognizer should
     /// receive a given touch. When `nil`, defaults to `true`.
-    private let shouldReceiveTouch: ((UIGestureRecognizer, UITouch) -> Bool)?
+    private let shouldReceiveTouch: (@MainActor (UIGestureRecognizer, UITouch) -> Bool)?
 
     /// An optional closure that determines whether the gesture recognizer should
     /// receive a given press. When `nil`, defaults to `true`.
-    private let shouldReceivePress: ((UIGestureRecognizer, UIPress) -> Bool)?
+    private let shouldReceivePress: (@MainActor (UIGestureRecognizer, UIPress) -> Bool)?
 
     /// An optional closure that determines whether the gesture recognizer should
     /// receive a given event. When `nil`, defaults to `true`.
-    private let shouldReceiveEvent: ((UIGestureRecognizer, UIEvent) -> Bool)?
+    private let shouldReceiveEvent: (@MainActor (UIGestureRecognizer, UIEvent) -> Bool)?
 
     /// An optional closure that determines whether this gesture recognizer should
     /// require the other gesture recognizer to fail before it can begin.
     /// When `nil`, defaults to `false`.
-    private let shouldRequireFailureOf: ((UIGestureRecognizer) -> Bool)?
+    private let shouldRequireFailureOf: (@MainActor (UIGestureRecognizer) -> Bool)?
 
     /// An optional closure that determines whether this gesture recognizer should
     /// be required to fail by the other gesture recognizer.
     /// When `nil`, defaults to `false`.
-    private let shouldBeRequiredToFailBy: ((UIGestureRecognizer) -> Bool)?
+    private let shouldBeRequiredToFailBy: (@MainActor (UIGestureRecognizer) -> Bool)?
 
     // MARK: - Initializer
 
@@ -221,16 +221,16 @@ public struct MultiFingerPinchGesture: UIGestureRecognizerRepresentable {
     ///     Defaults to `nil` (`false`).
     ///   - shouldBeRequiredToFailBy: Closure to control failure requirements.
     ///     Defaults to `nil` (`false`).
-    public init(onBegan: ((UIPinchGestureRecognizer) -> Void)? = nil,
-                onChanged: ((UIPinchGestureRecognizer) -> Void)? = nil,
-                onEnded: ((UIPinchGestureRecognizer) -> Void)? = nil,
-                shouldBegin: ((UIGestureRecognizer) -> Bool)? = nil,
-                shouldRecognizeSimultaneouslyWith: ((UIGestureRecognizer) -> Bool)? = nil,
-                shouldReceiveTouch: ((UIGestureRecognizer, UITouch) -> Bool)? = nil,
-                shouldReceivePress: ((UIGestureRecognizer, UIPress) -> Bool)? = nil,
-                shouldReceiveEvent: ((UIGestureRecognizer, UIEvent) -> Bool)? = nil,
-                shouldRequireFailureOf: ((UIGestureRecognizer) -> Bool)? = nil,
-                shouldBeRequiredToFailBy: ((UIGestureRecognizer) -> Bool)? = nil) {
+    public init(onBegan: (@MainActor (UIPinchGestureRecognizer) -> Void)? = nil,
+                onChanged: (@MainActor (UIPinchGestureRecognizer) -> Void)? = nil,
+                onEnded: (@MainActor (UIPinchGestureRecognizer) -> Void)? = nil,
+                shouldBegin: (@MainActor (UIGestureRecognizer) -> Bool)? = nil,
+                shouldRecognizeSimultaneouslyWith: (@MainActor (UIGestureRecognizer) -> Bool)? = nil,
+                shouldReceiveTouch: (@MainActor (UIGestureRecognizer, UITouch) -> Bool)? = nil,
+                shouldReceivePress: (@MainActor (UIGestureRecognizer, UIPress) -> Bool)? = nil,
+                shouldReceiveEvent: (@MainActor (UIGestureRecognizer, UIEvent) -> Bool)? = nil,
+                shouldRequireFailureOf: (@MainActor (UIGestureRecognizer) -> Bool)? = nil,
+                shouldBeRequiredToFailBy: (@MainActor (UIGestureRecognizer) -> Bool)? = nil) {
         self.onBegan = onBegan
         self.onChanged = onChanged
         self.onEnded = onEnded
@@ -269,7 +269,7 @@ public struct MultiFingerPinchGesture: UIGestureRecognizerRepresentable {
     ///         // Cache the original size before scaling begins
     ///     }
     /// ```
-    public func onBegan(_ action: @escaping (UIPinchGestureRecognizer) -> Void) -> MultiFingerPinchGesture {
+    public func onBegan(_ action: @escaping @MainActor (UIPinchGestureRecognizer) -> Void) -> MultiFingerPinchGesture {
         MultiFingerPinchGesture(onBegan: action,
                                 onChanged: self.onChanged,
                                 onEnded: self.onEnded,
@@ -293,7 +293,7 @@ public struct MultiFingerPinchGesture: UIGestureRecognizerRepresentable {
     ///         // Apply scale to your content
     ///     }
     /// ```
-    public func onChanged(_ action: @escaping (UIPinchGestureRecognizer) -> Void) -> MultiFingerPinchGesture {
+    public func onChanged(_ action: @escaping @MainActor (UIPinchGestureRecognizer) -> Void) -> MultiFingerPinchGesture {
         MultiFingerPinchGesture(onBegan: self.onBegan,
                                 onChanged: action,
                                 onEnded: self.onEnded,
@@ -316,7 +316,7 @@ public struct MultiFingerPinchGesture: UIGestureRecognizerRepresentable {
     ///         // Use velocity for momentum-based zoom animation
     ///     }
     /// ```
-    public func onEnded(_ action: @escaping (UIPinchGestureRecognizer) -> Void) -> MultiFingerPinchGesture {
+    public func onEnded(_ action: @escaping @MainActor (UIPinchGestureRecognizer) -> Void) -> MultiFingerPinchGesture {
         MultiFingerPinchGesture(onBegan: self.onBegan,
                                 onChanged: self.onChanged,
                                 onEnded: action,

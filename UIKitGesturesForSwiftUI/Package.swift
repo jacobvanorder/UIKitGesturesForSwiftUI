@@ -17,11 +17,21 @@ let package = Package(
         // Targets are the basic building blocks of a package, defining a module or a test suite.
         // Targets can depend on other targets in this package and products from dependencies.
         .target(
-            name: "UIKitGesturesForSwiftUI"
+            name: "UIKitGesturesForSwiftUI",
+            swiftSettings: [
+                .treatAllWarnings(as: .error),
+                .defaultIsolation(MainActor.self),
+                .enableUpcomingFeature("StrictConcurrency")
+            ]
         ),
         .testTarget(
             name: "UIKitGesturesForSwiftUITests",
-            dependencies: ["UIKitGesturesForSwiftUI"]
+            dependencies: ["UIKitGesturesForSwiftUI"],
+            swiftSettings: [
+                .treatAllWarnings(as: .error),
+                .defaultIsolation(MainActor.self),
+                .enableUpcomingFeature("StrictConcurrency")
+            ]
         ),
     ]
 )

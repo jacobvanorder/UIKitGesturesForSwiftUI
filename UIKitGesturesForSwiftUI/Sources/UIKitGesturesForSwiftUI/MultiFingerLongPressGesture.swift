@@ -101,25 +101,25 @@ public struct MultiFingerLongPressGesture: UIGestureRecognizerRepresentable {
     /// At this point the user has held their finger(s) for at least `minimumPressDuration`
     /// without moving beyond `allowableMovement`. The recognizer is passed so you can
     /// query `location(in:)` or `numberOfTouches`.
-    private let onBegan: ((UILongPressGestureRecognizer) -> Void)?
+    private let onBegan: (@MainActor (UILongPressGestureRecognizer) -> Void)?
 
     /// Called each time the gesture transitions to the `.changed` state.
     ///
     /// This fires whenever the user's finger(s) move while still pressing down.
     /// Use `location(in:)` on the recognizer to track the current position.
-    private let onChanged: ((UILongPressGestureRecognizer) -> Void)?
+    private let onChanged: (@MainActor (UILongPressGestureRecognizer) -> Void)?
 
     /// Called when the gesture transitions to the `.ended` state.
     ///
     /// This fires when the user lifts all fingers from the screen, completing the
     /// long-press interaction.
-    private let onEnded: ((UILongPressGestureRecognizer) -> Void)?
+    private let onEnded: (@MainActor (UILongPressGestureRecognizer) -> Void)?
 
     // MARK: - Delegate Closures
 
     /// An optional closure that determines whether the gesture recognizer should begin
     /// interpreting touches. When `nil`, defaults to `true`.
-    private let shouldBegin: ((UIGestureRecognizer) -> Bool)?
+    private let shouldBegin: (@MainActor (UIGestureRecognizer) -> Bool)?
 
     /// An optional closure that determines whether this gesture recognizer should
     /// recognize simultaneously with another gesture recognizer.
@@ -127,29 +127,29 @@ public struct MultiFingerLongPressGesture: UIGestureRecognizerRepresentable {
     /// Return `true` to allow both gestures to proceed at the same time, or `false`
     /// to prevent simultaneous recognition. When `nil`, the default behavior is to
     /// allow simultaneous recognition (`true`).
-    private let shouldRecognizeSimultaneouslyWith: ((UIGestureRecognizer) -> Bool)?
+    private let shouldRecognizeSimultaneouslyWith: (@MainActor (UIGestureRecognizer) -> Bool)?
 
     /// An optional closure that determines whether the gesture recognizer should
     /// receive a given touch. When `nil`, defaults to `true`.
-    private let shouldReceiveTouch: ((UIGestureRecognizer, UITouch) -> Bool)?
+    private let shouldReceiveTouch: (@MainActor (UIGestureRecognizer, UITouch) -> Bool)?
 
     /// An optional closure that determines whether the gesture recognizer should
     /// receive a given press. When `nil`, defaults to `true`.
-    private let shouldReceivePress: ((UIGestureRecognizer, UIPress) -> Bool)?
+    private let shouldReceivePress: (@MainActor (UIGestureRecognizer, UIPress) -> Bool)?
 
     /// An optional closure that determines whether the gesture recognizer should
     /// receive a given event. When `nil`, defaults to `true`.
-    private let shouldReceiveEvent: ((UIGestureRecognizer, UIEvent) -> Bool)?
+    private let shouldReceiveEvent: (@MainActor (UIGestureRecognizer, UIEvent) -> Bool)?
 
     /// An optional closure that determines whether this gesture recognizer should
     /// require the other gesture recognizer to fail before it can begin.
     /// When `nil`, defaults to `false`.
-    private let shouldRequireFailureOf: ((UIGestureRecognizer) -> Bool)?
+    private let shouldRequireFailureOf: (@MainActor (UIGestureRecognizer) -> Bool)?
 
     /// An optional closure that determines whether this gesture recognizer should
     /// be required to fail by the other gesture recognizer.
     /// When `nil`, defaults to `false`.
-    private let shouldBeRequiredToFailBy: ((UIGestureRecognizer) -> Bool)?
+    private let shouldBeRequiredToFailBy: (@MainActor (UIGestureRecognizer) -> Bool)?
 
     // MARK: - Initializer
 
@@ -183,16 +183,16 @@ public struct MultiFingerLongPressGesture: UIGestureRecognizerRepresentable {
                 numberOfTouchesRequired: Int = 1,
                 numberOfTapsRequired: Int = 0,
                 allowableMovement: CGFloat = 10,
-                onBegan: ((UILongPressGestureRecognizer) -> Void)? = nil,
-                onChanged: ((UILongPressGestureRecognizer) -> Void)? = nil,
-                onEnded: ((UILongPressGestureRecognizer) -> Void)? = nil,
-                shouldBegin: ((UIGestureRecognizer) -> Bool)? = nil,
-                shouldRecognizeSimultaneouslyWith: ((UIGestureRecognizer) -> Bool)? = nil,
-                shouldReceiveTouch: ((UIGestureRecognizer, UITouch) -> Bool)? = nil,
-                shouldReceivePress: ((UIGestureRecognizer, UIPress) -> Bool)? = nil,
-                shouldReceiveEvent: ((UIGestureRecognizer, UIEvent) -> Bool)? = nil,
-                shouldRequireFailureOf: ((UIGestureRecognizer) -> Bool)? = nil,
-                shouldBeRequiredToFailBy: ((UIGestureRecognizer) -> Bool)? = nil) {
+                onBegan: (@MainActor (UILongPressGestureRecognizer) -> Void)? = nil,
+                onChanged: (@MainActor (UILongPressGestureRecognizer) -> Void)? = nil,
+                onEnded: (@MainActor (UILongPressGestureRecognizer) -> Void)? = nil,
+                shouldBegin: (@MainActor (UIGestureRecognizer) -> Bool)? = nil,
+                shouldRecognizeSimultaneouslyWith: (@MainActor (UIGestureRecognizer) -> Bool)? = nil,
+                shouldReceiveTouch: (@MainActor (UIGestureRecognizer, UITouch) -> Bool)? = nil,
+                shouldReceivePress: (@MainActor (UIGestureRecognizer, UIPress) -> Bool)? = nil,
+                shouldReceiveEvent: (@MainActor (UIGestureRecognizer, UIEvent) -> Bool)? = nil,
+                shouldRequireFailureOf: (@MainActor (UIGestureRecognizer) -> Bool)? = nil,
+                shouldBeRequiredToFailBy: (@MainActor (UIGestureRecognizer) -> Bool)? = nil) {
         self.minimumPressDuration = minimumPressDuration
         self.numberOfTouchesRequired = numberOfTouchesRequired
         self.numberOfTapsRequired = numberOfTapsRequired
@@ -250,7 +250,7 @@ public struct MultiFingerLongPressGesture: UIGestureRecognizerRepresentable {
     ///         // Handle began
     ///     }
     /// ```
-    public func onBegan(_ action: @escaping (UILongPressGestureRecognizer) -> Void) -> MultiFingerLongPressGesture {
+    public func onBegan(_ action: @escaping @MainActor (UILongPressGestureRecognizer) -> Void) -> MultiFingerLongPressGesture {
         MultiFingerLongPressGesture(minimumPressDuration: self.minimumPressDuration,
                                     numberOfTouchesRequired: self.numberOfTouchesRequired,
                                     numberOfTapsRequired: self.numberOfTapsRequired,
@@ -277,7 +277,7 @@ public struct MultiFingerLongPressGesture: UIGestureRecognizerRepresentable {
     ///         // Track finger movement during press
     ///     }
     /// ```
-    public func onChanged(_ action: @escaping (UILongPressGestureRecognizer) -> Void) -> MultiFingerLongPressGesture {
+    public func onChanged(_ action: @escaping @MainActor (UILongPressGestureRecognizer) -> Void) -> MultiFingerLongPressGesture {
         MultiFingerLongPressGesture(minimumPressDuration: self.minimumPressDuration,
                                     numberOfTouchesRequired: self.numberOfTouchesRequired,
                                     numberOfTapsRequired: self.numberOfTapsRequired,
@@ -303,7 +303,7 @@ public struct MultiFingerLongPressGesture: UIGestureRecognizerRepresentable {
     ///         // User lifted their fingers
     ///     }
     /// ```
-    public func onEnded(_ action: @escaping (UILongPressGestureRecognizer) -> Void) -> MultiFingerLongPressGesture {
+    public func onEnded(_ action: @escaping @MainActor (UILongPressGestureRecognizer) -> Void) -> MultiFingerLongPressGesture {
         MultiFingerLongPressGesture(minimumPressDuration: self.minimumPressDuration,
                                     numberOfTouchesRequired: self.numberOfTouchesRequired,
                                     numberOfTapsRequired: self.numberOfTapsRequired,

@@ -253,7 +253,7 @@ public struct MultiFingerTransformGesture: UIGestureRecognizerRepresentable {
     ///     baseOffset = currentOffset
     /// }
     /// ```
-    private let onBegan: ((TransformGestureRecognizer) -> Void)?
+    private let onBegan: (@MainActor (TransformGestureRecognizer) -> Void)?
 
     /// Called each time the gesture transitions to the `.changed` state.
     ///
@@ -277,7 +277,7 @@ public struct MultiFingerTransformGesture: UIGestureRecognizerRepresentable {
     ///     )
     /// }
     /// ```
-    private let onChanged: ((TransformGestureRecognizer) -> Void)?
+    private let onChanged: (@MainActor (TransformGestureRecognizer) -> Void)?
 
     /// Called when the gesture transitions to the `.ended` state.
     ///
@@ -293,13 +293,13 @@ public struct MultiFingerTransformGesture: UIGestureRecognizerRepresentable {
     ///     // Start momentum animation
     /// }
     /// ```
-    private let onEnded: ((TransformGestureRecognizer) -> Void)?
+    private let onEnded: (@MainActor (TransformGestureRecognizer) -> Void)?
 
     // MARK: - Delegate Closures
 
     /// An optional closure that determines whether the gesture recognizer should begin
     /// interpreting touches. When `nil`, defaults to `true`.
-    private let shouldBegin: ((UIGestureRecognizer) -> Bool)?
+    private let shouldBegin: (@MainActor (UIGestureRecognizer) -> Bool)?
 
     /// An optional closure that determines whether this gesture recognizer should
     /// recognize simultaneously with another gesture recognizer.
@@ -312,29 +312,29 @@ public struct MultiFingerTransformGesture: UIGestureRecognizerRepresentable {
     /// pan into a single gesture, you typically don't need to combine it with
     /// other two-finger gestures. However, you might want to combine it with
     /// single-finger gestures (taps, long presses) or discrete gestures (swipes).
-    private let shouldRecognizeSimultaneouslyWith: ((UIGestureRecognizer) -> Bool)?
+    private let shouldRecognizeSimultaneouslyWith: (@MainActor (UIGestureRecognizer) -> Bool)?
 
     /// An optional closure that determines whether the gesture recognizer should
     /// receive a given touch. When `nil`, defaults to `true`.
-    private let shouldReceiveTouch: ((UIGestureRecognizer, UITouch) -> Bool)?
+    private let shouldReceiveTouch: (@MainActor (UIGestureRecognizer, UITouch) -> Bool)?
 
     /// An optional closure that determines whether the gesture recognizer should
     /// receive a given press. When `nil`, defaults to `true`.
-    private let shouldReceivePress: ((UIGestureRecognizer, UIPress) -> Bool)?
+    private let shouldReceivePress: (@MainActor (UIGestureRecognizer, UIPress) -> Bool)?
 
     /// An optional closure that determines whether the gesture recognizer should
     /// receive a given event. When `nil`, defaults to `true`.
-    private let shouldReceiveEvent: ((UIGestureRecognizer, UIEvent) -> Bool)?
+    private let shouldReceiveEvent: (@MainActor (UIGestureRecognizer, UIEvent) -> Bool)?
 
     /// An optional closure that determines whether this gesture recognizer should
     /// require the other gesture recognizer to fail before it can begin.
     /// When `nil`, defaults to `false`.
-    private let shouldRequireFailureOf: ((UIGestureRecognizer) -> Bool)?
+    private let shouldRequireFailureOf: (@MainActor (UIGestureRecognizer) -> Bool)?
 
     /// An optional closure that determines whether this gesture recognizer should
     /// be required to fail by the other gesture recognizer.
     /// When `nil`, defaults to `false`.
-    private let shouldBeRequiredToFailBy: ((UIGestureRecognizer) -> Bool)?
+    private let shouldBeRequiredToFailBy: (@MainActor (UIGestureRecognizer) -> Bool)?
 
     // MARK: - Initializer
 
@@ -363,16 +363,16 @@ public struct MultiFingerTransformGesture: UIGestureRecognizerRepresentable {
     ///     Defaults to `nil` (`false`).
     ///   - shouldBeRequiredToFailBy: Closure to control failure requirements.
     ///     Defaults to `nil` (`false`).
-    public init(onBegan: ((TransformGestureRecognizer) -> Void)? = nil,
-                onChanged: ((TransformGestureRecognizer) -> Void)? = nil,
-                onEnded: ((TransformGestureRecognizer) -> Void)? = nil,
-                shouldBegin: ((UIGestureRecognizer) -> Bool)? = nil,
-                shouldRecognizeSimultaneouslyWith: ((UIGestureRecognizer) -> Bool)? = nil,
-                shouldReceiveTouch: ((UIGestureRecognizer, UITouch) -> Bool)? = nil,
-                shouldReceivePress: ((UIGestureRecognizer, UIPress) -> Bool)? = nil,
-                shouldReceiveEvent: ((UIGestureRecognizer, UIEvent) -> Bool)? = nil,
-                shouldRequireFailureOf: ((UIGestureRecognizer) -> Bool)? = nil,
-                shouldBeRequiredToFailBy: ((UIGestureRecognizer) -> Bool)? = nil) {
+    public init(onBegan: (@MainActor (TransformGestureRecognizer) -> Void)? = nil,
+                onChanged: (@MainActor (TransformGestureRecognizer) -> Void)? = nil,
+                onEnded: (@MainActor (TransformGestureRecognizer) -> Void)? = nil,
+                shouldBegin: (@MainActor (UIGestureRecognizer) -> Bool)? = nil,
+                shouldRecognizeSimultaneouslyWith: (@MainActor (UIGestureRecognizer) -> Bool)? = nil,
+                shouldReceiveTouch: (@MainActor (UIGestureRecognizer, UITouch) -> Bool)? = nil,
+                shouldReceivePress: (@MainActor (UIGestureRecognizer, UIPress) -> Bool)? = nil,
+                shouldReceiveEvent: (@MainActor (UIGestureRecognizer, UIEvent) -> Bool)? = nil,
+                shouldRequireFailureOf: (@MainActor (UIGestureRecognizer) -> Bool)? = nil,
+                shouldBeRequiredToFailBy: (@MainActor (UIGestureRecognizer) -> Bool)? = nil) {
         self.onBegan = onBegan
         self.onChanged = onChanged
         self.onEnded = onEnded
@@ -411,7 +411,7 @@ public struct MultiFingerTransformGesture: UIGestureRecognizerRepresentable {
     ///         // Cache original transform values before the gesture begins
     ///     }
     /// ```
-    public func onBegan(_ action: @escaping (TransformGestureRecognizer) -> Void) -> MultiFingerTransformGesture {
+    public func onBegan(_ action: @escaping @MainActor (TransformGestureRecognizer) -> Void) -> MultiFingerTransformGesture {
         MultiFingerTransformGesture(onBegan: action,
                                      onChanged: self.onChanged,
                                      onEnded: self.onEnded,
@@ -436,7 +436,7 @@ public struct MultiFingerTransformGesture: UIGestureRecognizerRepresentable {
     ///         // Apply combined transform to your content
     ///     }
     /// ```
-    public func onChanged(_ action: @escaping (TransformGestureRecognizer) -> Void) -> MultiFingerTransformGesture {
+    public func onChanged(_ action: @escaping @MainActor (TransformGestureRecognizer) -> Void) -> MultiFingerTransformGesture {
         MultiFingerTransformGesture(onBegan: self.onBegan,
                                      onChanged: action,
                                      onEnded: self.onEnded,
@@ -460,7 +460,7 @@ public struct MultiFingerTransformGesture: UIGestureRecognizerRepresentable {
     ///         // Use velocities for momentum-based animation
     ///     }
     /// ```
-    public func onEnded(_ action: @escaping (TransformGestureRecognizer) -> Void) -> MultiFingerTransformGesture {
+    public func onEnded(_ action: @escaping @MainActor (TransformGestureRecognizer) -> Void) -> MultiFingerTransformGesture {
         MultiFingerTransformGesture(onBegan: self.onBegan,
                                      onChanged: self.onChanged,
                                      onEnded: action,

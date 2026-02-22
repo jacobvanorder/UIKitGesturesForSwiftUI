@@ -161,7 +161,7 @@ public struct MultiFingerRotationGesture: UIGestureRecognizerRepresentable {
     /// recognized as a rotation. The `rotation` on the recognizer will be close to
     /// `0.0` radians. This is the ideal place to cache your content's original angle
     /// so you can apply the absolute rotation in subsequent `onChanged` calls.
-    private let onBegan: ((UIRotationGestureRecognizer) -> Void)?
+    private let onBegan: (@MainActor (UIRotationGestureRecognizer) -> Void)?
 
     /// Called each time the gesture transitions to the `.changed` state.
     ///
@@ -173,20 +173,20 @@ public struct MultiFingerRotationGesture: UIGestureRecognizerRepresentable {
     /// > Tip: If you need delta-based rotation, reset `recognizer.rotation = 0`
     /// > at the end of each `onChanged` call. See the struct-level documentation
     /// > for a full example.
-    private let onChanged: ((UIRotationGestureRecognizer) -> Void)?
+    private let onChanged: (@MainActor (UIRotationGestureRecognizer) -> Void)?
 
     /// Called when the gesture transitions to the `.ended` state.
     ///
     /// This fires when the user lifts one or both fingers, completing the rotation.
     /// You can still read `recognizer.velocity` at this point — useful for driving
     /// momentum-based spin animations that continue after the fingers lift.
-    private let onEnded: ((UIRotationGestureRecognizer) -> Void)?
+    private let onEnded: (@MainActor (UIRotationGestureRecognizer) -> Void)?
 
     // MARK: - Delegate Closures
 
     /// An optional closure that determines whether the gesture recognizer should begin
     /// interpreting touches. When `nil`, defaults to `true`.
-    private let shouldBegin: ((UIGestureRecognizer) -> Bool)?
+    private let shouldBegin: (@MainActor (UIGestureRecognizer) -> Bool)?
 
     /// An optional closure that determines whether this gesture recognizer should
     /// recognize simultaneously with another gesture recognizer.
@@ -199,29 +199,29 @@ public struct MultiFingerRotationGesture: UIGestureRecognizerRepresentable {
     /// both a `MultiFingerRotationGesture` and a `MultiFingerPinchGesture` to the
     /// same view, allowing simultaneous recognition lets the user rotate and scale
     /// content in a single two-finger motion.
-    private let shouldRecognizeSimultaneouslyWith: ((UIGestureRecognizer) -> Bool)?
+    private let shouldRecognizeSimultaneouslyWith: (@MainActor (UIGestureRecognizer) -> Bool)?
 
     /// An optional closure that determines whether the gesture recognizer should
     /// receive a given touch. When `nil`, defaults to `true`.
-    private let shouldReceiveTouch: ((UIGestureRecognizer, UITouch) -> Bool)?
+    private let shouldReceiveTouch: (@MainActor (UIGestureRecognizer, UITouch) -> Bool)?
 
     /// An optional closure that determines whether the gesture recognizer should
     /// receive a given press. When `nil`, defaults to `true`.
-    private let shouldReceivePress: ((UIGestureRecognizer, UIPress) -> Bool)?
+    private let shouldReceivePress: (@MainActor (UIGestureRecognizer, UIPress) -> Bool)?
 
     /// An optional closure that determines whether the gesture recognizer should
     /// receive a given event. When `nil`, defaults to `true`.
-    private let shouldReceiveEvent: ((UIGestureRecognizer, UIEvent) -> Bool)?
+    private let shouldReceiveEvent: (@MainActor (UIGestureRecognizer, UIEvent) -> Bool)?
 
     /// An optional closure that determines whether this gesture recognizer should
     /// require the other gesture recognizer to fail before it can begin.
     /// When `nil`, defaults to `false`.
-    private let shouldRequireFailureOf: ((UIGestureRecognizer) -> Bool)?
+    private let shouldRequireFailureOf: (@MainActor (UIGestureRecognizer) -> Bool)?
 
     /// An optional closure that determines whether this gesture recognizer should
     /// be required to fail by the other gesture recognizer.
     /// When `nil`, defaults to `false`.
-    private let shouldBeRequiredToFailBy: ((UIGestureRecognizer) -> Bool)?
+    private let shouldBeRequiredToFailBy: (@MainActor (UIGestureRecognizer) -> Bool)?
 
     // MARK: - Initializer
 
@@ -249,16 +249,16 @@ public struct MultiFingerRotationGesture: UIGestureRecognizerRepresentable {
     ///     Defaults to `nil` (`false`).
     ///   - shouldBeRequiredToFailBy: Closure to control failure requirements.
     ///     Defaults to `nil` (`false`).
-    public init(onBegan: ((UIRotationGestureRecognizer) -> Void)? = nil,
-                onChanged: ((UIRotationGestureRecognizer) -> Void)? = nil,
-                onEnded: ((UIRotationGestureRecognizer) -> Void)? = nil,
-                shouldBegin: ((UIGestureRecognizer) -> Bool)? = nil,
-                shouldRecognizeSimultaneouslyWith: ((UIGestureRecognizer) -> Bool)? = nil,
-                shouldReceiveTouch: ((UIGestureRecognizer, UITouch) -> Bool)? = nil,
-                shouldReceivePress: ((UIGestureRecognizer, UIPress) -> Bool)? = nil,
-                shouldReceiveEvent: ((UIGestureRecognizer, UIEvent) -> Bool)? = nil,
-                shouldRequireFailureOf: ((UIGestureRecognizer) -> Bool)? = nil,
-                shouldBeRequiredToFailBy: ((UIGestureRecognizer) -> Bool)? = nil) {
+    public init(onBegan: (@MainActor (UIRotationGestureRecognizer) -> Void)? = nil,
+                onChanged: (@MainActor (UIRotationGestureRecognizer) -> Void)? = nil,
+                onEnded: (@MainActor (UIRotationGestureRecognizer) -> Void)? = nil,
+                shouldBegin: (@MainActor (UIGestureRecognizer) -> Bool)? = nil,
+                shouldRecognizeSimultaneouslyWith: (@MainActor (UIGestureRecognizer) -> Bool)? = nil,
+                shouldReceiveTouch: (@MainActor (UIGestureRecognizer, UITouch) -> Bool)? = nil,
+                shouldReceivePress: (@MainActor (UIGestureRecognizer, UIPress) -> Bool)? = nil,
+                shouldReceiveEvent: (@MainActor (UIGestureRecognizer, UIEvent) -> Bool)? = nil,
+                shouldRequireFailureOf: (@MainActor (UIGestureRecognizer) -> Bool)? = nil,
+                shouldBeRequiredToFailBy: (@MainActor (UIGestureRecognizer) -> Bool)? = nil) {
         self.onBegan = onBegan
         self.onChanged = onChanged
         self.onEnded = onEnded
@@ -297,7 +297,7 @@ public struct MultiFingerRotationGesture: UIGestureRecognizerRepresentable {
     ///         // Cache the original angle before rotation begins
     ///     }
     /// ```
-    public func onBegan(_ action: @escaping (UIRotationGestureRecognizer) -> Void) -> MultiFingerRotationGesture {
+    public func onBegan(_ action: @escaping @MainActor (UIRotationGestureRecognizer) -> Void) -> MultiFingerRotationGesture {
         MultiFingerRotationGesture(onBegan: action,
                                    onChanged: self.onChanged,
                                    onEnded: self.onEnded,
@@ -321,7 +321,7 @@ public struct MultiFingerRotationGesture: UIGestureRecognizerRepresentable {
     ///         // Apply rotation to your content
     ///     }
     /// ```
-    public func onChanged(_ action: @escaping (UIRotationGestureRecognizer) -> Void) -> MultiFingerRotationGesture {
+    public func onChanged(_ action: @escaping @MainActor (UIRotationGestureRecognizer) -> Void) -> MultiFingerRotationGesture {
         MultiFingerRotationGesture(onBegan: self.onBegan,
                                    onChanged: action,
                                    onEnded: self.onEnded,
@@ -344,7 +344,7 @@ public struct MultiFingerRotationGesture: UIGestureRecognizerRepresentable {
     ///         // Use velocity for momentum-based spin animation
     ///     }
     /// ```
-    public func onEnded(_ action: @escaping (UIRotationGestureRecognizer) -> Void) -> MultiFingerRotationGesture {
+    public func onEnded(_ action: @escaping @MainActor (UIRotationGestureRecognizer) -> Void) -> MultiFingerRotationGesture {
         MultiFingerRotationGesture(onBegan: self.onBegan,
                                    onChanged: self.onChanged,
                                    onEnded: action,

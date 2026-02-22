@@ -74,13 +74,13 @@ public struct MultiFingerTapGesture: UIGestureRecognizerRepresentable {
     /// lifecycle callback. It fires once when all required taps with the required
     /// number of fingers have been completed. The recognizer is passed so you can
     /// query `location(in:)` or `location(ofTouch:in:)`.
-    private let onEnded: ((UITapGestureRecognizer) -> Void)?
+    private let onEnded: (@MainActor (UITapGestureRecognizer) -> Void)?
 
     // MARK: - Delegate Closures
 
     /// An optional closure that determines whether the gesture recognizer should begin
     /// interpreting touches. When `nil`, defaults to `true`.
-    private let shouldBegin: ((UIGestureRecognizer) -> Bool)?
+    private let shouldBegin: (@MainActor (UIGestureRecognizer) -> Bool)?
 
     /// An optional closure that determines whether this gesture recognizer should
     /// recognize simultaneously with another gesture recognizer.
@@ -88,29 +88,29 @@ public struct MultiFingerTapGesture: UIGestureRecognizerRepresentable {
     /// Return `true` to allow both gestures to proceed at the same time, or `false`
     /// to prevent simultaneous recognition. When `nil`, the default behavior is to
     /// allow simultaneous recognition (`true`).
-    private let shouldRecognizeSimultaneouslyWith: ((UIGestureRecognizer) -> Bool)?
+    private let shouldRecognizeSimultaneouslyWith: (@MainActor (UIGestureRecognizer) -> Bool)?
 
     /// An optional closure that determines whether the gesture recognizer should
     /// receive a given touch. When `nil`, defaults to `true`.
-    private let shouldReceiveTouch: ((UIGestureRecognizer, UITouch) -> Bool)?
+    private let shouldReceiveTouch: (@MainActor (UIGestureRecognizer, UITouch) -> Bool)?
 
     /// An optional closure that determines whether the gesture recognizer should
     /// receive a given press. When `nil`, defaults to `true`.
-    private let shouldReceivePress: ((UIGestureRecognizer, UIPress) -> Bool)?
+    private let shouldReceivePress: (@MainActor (UIGestureRecognizer, UIPress) -> Bool)?
 
     /// An optional closure that determines whether the gesture recognizer should
     /// receive a given event. When `nil`, defaults to `true`.
-    private let shouldReceiveEvent: ((UIGestureRecognizer, UIEvent) -> Bool)?
+    private let shouldReceiveEvent: (@MainActor (UIGestureRecognizer, UIEvent) -> Bool)?
 
     /// An optional closure that determines whether this gesture recognizer should
     /// require the other gesture recognizer to fail before it can begin.
     /// When `nil`, defaults to `false`.
-    private let shouldRequireFailureOf: ((UIGestureRecognizer) -> Bool)?
+    private let shouldRequireFailureOf: (@MainActor (UIGestureRecognizer) -> Bool)?
 
     /// An optional closure that determines whether this gesture recognizer should
     /// be required to fail by the other gesture recognizer.
     /// When `nil`, defaults to `false`.
-    private let shouldBeRequiredToFailBy: ((UIGestureRecognizer) -> Bool)?
+    private let shouldBeRequiredToFailBy: (@MainActor (UIGestureRecognizer) -> Bool)?
 
     // MARK: - Initializer
 
@@ -135,14 +135,14 @@ public struct MultiFingerTapGesture: UIGestureRecognizerRepresentable {
     ///     Defaults to `nil` (`false`).
     public init(numberOfTapsRequired: Int = 1,
                 numberOfTouchesRequired: Int = 1,
-                onEnded: ((UITapGestureRecognizer) -> Void)? = nil,
-                shouldBegin: ((UIGestureRecognizer) -> Bool)? = nil,
-                shouldRecognizeSimultaneouslyWith: ((UIGestureRecognizer) -> Bool)? = nil,
-                shouldReceiveTouch: ((UIGestureRecognizer, UITouch) -> Bool)? = nil,
-                shouldReceivePress: ((UIGestureRecognizer, UIPress) -> Bool)? = nil,
-                shouldReceiveEvent: ((UIGestureRecognizer, UIEvent) -> Bool)? = nil,
-                shouldRequireFailureOf: ((UIGestureRecognizer) -> Bool)? = nil,
-                shouldBeRequiredToFailBy: ((UIGestureRecognizer) -> Bool)? = nil) {
+                onEnded: (@MainActor (UITapGestureRecognizer) -> Void)? = nil,
+                shouldBegin: (@MainActor (UIGestureRecognizer) -> Bool)? = nil,
+                shouldRecognizeSimultaneouslyWith: (@MainActor (UIGestureRecognizer) -> Bool)? = nil,
+                shouldReceiveTouch: (@MainActor (UIGestureRecognizer, UITouch) -> Bool)? = nil,
+                shouldReceivePress: (@MainActor (UIGestureRecognizer, UIPress) -> Bool)? = nil,
+                shouldReceiveEvent: (@MainActor (UIGestureRecognizer, UIEvent) -> Bool)? = nil,
+                shouldRequireFailureOf: (@MainActor (UIGestureRecognizer) -> Bool)? = nil,
+                shouldBeRequiredToFailBy: (@MainActor (UIGestureRecognizer) -> Bool)? = nil) {
         self.numberOfTapsRequired = numberOfTapsRequired
         self.numberOfTouchesRequired = numberOfTouchesRequired
         self.onEnded = onEnded
@@ -191,7 +191,7 @@ public struct MultiFingerTapGesture: UIGestureRecognizerRepresentable {
     ///         // Handle the tap
     ///     }
     /// ```
-    public func onEnded(_ action: @escaping (UITapGestureRecognizer) -> Void) -> MultiFingerTapGesture {
+    public func onEnded(_ action: @escaping @MainActor (UITapGestureRecognizer) -> Void) -> MultiFingerTapGesture {
         MultiFingerTapGesture(numberOfTapsRequired: self.numberOfTapsRequired,
                               numberOfTouchesRequired: self.numberOfTouchesRequired,
                               onEnded: action,

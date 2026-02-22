@@ -3,7 +3,11 @@
     "allow": [
       "mcp__xcode__XcodeRead",
       "mcp__xcode__DocumentationSearch",
-      "mcp__xcode__XcodeListWindows"
+      "mcp__xcode__XcodeListWindows",
+      "mcp__xcode__XcodeUpdate",
+      "mcp__xcode__RunAllTests",
+      "mcp__xcode__GetBuildLog",
+      "Bash(xcodebuild test:*)"
     ]
   }
 }

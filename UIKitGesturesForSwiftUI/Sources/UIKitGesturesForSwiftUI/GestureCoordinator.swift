@@ -28,43 +28,44 @@ import UIKit
 /// | `shouldReceive(_:UIEvent)` | `shouldReceiveEvent` | `true` |
 /// | `shouldRequireFailureOf` | `shouldRequireFailureOf` | `false` |
 /// | `shouldBeRequiredToFailBy` | `shouldBeRequiredToFailBy` | `false` |
+@MainActor
 public class GestureCoordinator: NSObject, UIGestureRecognizerDelegate {
 
     /// Determines whether the gesture recognizer should begin interpreting touches.
     /// When `nil`, defaults to `true`.
-    let shouldBegin: ((UIGestureRecognizer) -> Bool)?
+    let shouldBegin: (@MainActor (UIGestureRecognizer) -> Bool)?
 
     /// Determines whether this gesture recognizer should recognize simultaneously
     /// with another. When `nil`, defaults to `true`.
-    let shouldRecognizeSimultaneouslyWith: ((UIGestureRecognizer) -> Bool)?
+    let shouldRecognizeSimultaneouslyWith: (@MainActor (UIGestureRecognizer) -> Bool)?
 
     /// Determines whether the gesture recognizer should receive a given touch.
     /// When `nil`, defaults to `true`.
-    let shouldReceiveTouch: ((UIGestureRecognizer, UITouch) -> Bool)?
+    let shouldReceiveTouch: (@MainActor (UIGestureRecognizer, UITouch) -> Bool)?
 
     /// Determines whether the gesture recognizer should receive a given press.
     /// When `nil`, defaults to `true`.
-    let shouldReceivePress: ((UIGestureRecognizer, UIPress) -> Bool)?
+    let shouldReceivePress: (@MainActor (UIGestureRecognizer, UIPress) -> Bool)?
 
     /// Determines whether the gesture recognizer should receive a given event.
     /// When `nil`, defaults to `true`.
-    let shouldReceiveEvent: ((UIGestureRecognizer, UIEvent) -> Bool)?
+    let shouldReceiveEvent: (@MainActor (UIGestureRecognizer, UIEvent) -> Bool)?
 
     /// Determines whether this gesture recognizer should require the other
     /// gesture recognizer to fail before it can begin. When `nil`, defaults to `false`.
-    let shouldRequireFailureOf: ((UIGestureRecognizer) -> Bool)?
+    let shouldRequireFailureOf: (@MainActor (UIGestureRecognizer) -> Bool)?
 
     /// Determines whether this gesture recognizer should be required to fail
     /// by the other gesture recognizer. When `nil`, defaults to `false`.
-    let shouldBeRequiredToFailBy: ((UIGestureRecognizer) -> Bool)?
+    let shouldBeRequiredToFailBy: (@MainActor (UIGestureRecognizer) -> Bool)?
 
-    internal init(shouldBegin: ((UIGestureRecognizer) -> Bool)? = nil,
-                  shouldRecognizeSimultaneouslyWith: ((UIGestureRecognizer) -> Bool)? = nil,
-                  shouldReceiveTouch: ((UIGestureRecognizer, UITouch) -> Bool)? = nil,
-                  shouldReceivePress: ((UIGestureRecognizer, UIPress) -> Bool)? = nil,
-                  shouldReceiveEvent: ((UIGestureRecognizer, UIEvent) -> Bool)? = nil,
-                  shouldRequireFailureOf: ((UIGestureRecognizer) -> Bool)? = nil,
-                  shouldBeRequiredToFailBy: ((UIGestureRecognizer) -> Bool)? = nil) {
+    internal init(shouldBegin: (@MainActor (UIGestureRecognizer) -> Bool)? = nil,
+                  shouldRecognizeSimultaneouslyWith: (@MainActor (UIGestureRecognizer) -> Bool)? = nil,
+                  shouldReceiveTouch: (@MainActor (UIGestureRecognizer, UITouch) -> Bool)? = nil,
+                  shouldReceivePress: (@MainActor (UIGestureRecognizer, UIPress) -> Bool)? = nil,
+                  shouldReceiveEvent: (@MainActor (UIGestureRecognizer, UIEvent) -> Bool)? = nil,
+                  shouldRequireFailureOf: (@MainActor (UIGestureRecognizer) -> Bool)? = nil,
+                  shouldBeRequiredToFailBy: (@MainActor (UIGestureRecognizer) -> Bool)? = nil) {
         self.shouldBegin = shouldBegin
         self.shouldRecognizeSimultaneouslyWith = shouldRecognizeSimultaneouslyWith
         self.shouldReceiveTouch = shouldReceiveTouch
