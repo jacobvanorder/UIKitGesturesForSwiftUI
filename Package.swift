@@ -19,18 +19,16 @@ let package = Package(
         .target(
             name: "UIKitGesturesForSwiftUI",
             swiftSettings: [
-                .treatAllWarnings(as: .error),
                 .defaultIsolation(MainActor.self),
-                .enableUpcomingFeature("StrictConcurrency")
+                .swiftLanguageMode(.v6)
             ]
         ),
         .testTarget(
             name: "UIKitGesturesForSwiftUITests",
             dependencies: ["UIKitGesturesForSwiftUI"],
             swiftSettings: [
-                .treatAllWarnings(as: .error),
                 .defaultIsolation(MainActor.self),
-                .enableUpcomingFeature("StrictConcurrency")
+                .swiftLanguageMode(.v6)
             ]
         ),
     ]
