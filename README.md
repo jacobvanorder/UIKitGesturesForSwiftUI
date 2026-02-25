@@ -119,7 +119,7 @@ MultiFingerTapGesture(
     numberOfTouchesRequired: 3,
     numberOfTapsRequired: 2  // Double-tap with 3 fingers
 )
-.onRecognized { recognizer in
+.onEnded { recognizer in
     print("Triple-finger double-tap detected!")
 }
 ```
@@ -184,7 +184,7 @@ MultiFingerSwipeGesture(
     numberOfTouchesRequired: 3,
     direction: .down
 )
-.onRecognized { recognizer in
+.onEnded { recognizer in
     print("Three-finger swipe down detected!")
 }
 ```
@@ -337,13 +337,12 @@ All continuous gestures follow this state machine:
                ↘ .failed
 ```
 
-**Discrete gestures** (tap, swipe) transition directly to `.recognized`
+**Discrete gestures** (tap, swipe) transition directly to `.onEnded`
 
 **Callbacks provided:**
 - `.onBegan` - Gesture started (continuous only)
 - `.onChanged` - Gesture updated (continuous only)
-- `.onEnded` - Gesture completed (continuous only)
-- `.onRecognized` - Gesture recognized (discrete only)
+- `.onEnded` - Gesture completed (continuous and discrete)
 
 **Note:** `.cancelled` and `.failed` states are not exposed as they indicate the gesture did not complete successfully.
 
@@ -452,7 +451,7 @@ struct GestureDemo: View {
                         other is UITapGestureRecognizer && other.numberOfTapsRequired == 2
                     }
                 )
-                .onRecognized { _ in
+                .onEnded { _ in
                     singleTapCount += 1
                 }
             )
@@ -461,7 +460,7 @@ struct GestureDemo: View {
                     numberOfTouchesRequired: 1,
                     numberOfTapsRequired: 2
                 )
-                .onRecognized { _ in
+                .onEnded { _ in
                     doubleTapCount += 1
                 }
             )
